@@ -11,4 +11,5 @@ NEW string 3
 ####все файлы имя которых заканчивается на .tfvars
 ####файл override.tf и override.tf.json
 ####все файлы имя которых заканчивается на *_override.tf и *_override.tf.json
-####файл .terraformrc и terraform.rcadd new branch Fix
+####файл .terraformrc и terraform.rc
+add new branch Fix
