@@ -16,6 +16,7 @@
 гитхабе.  
 
 datasource https://github.com/hashicorp/terraform-provider-aws/blob/c0584b28cc281774d9d4756c4d25b7a07391413b/internal/provider/provider.go#L415
+
 resources https://github.com/hashicorp/terraform-provider-aws/blob/c0584b28cc281774d9d4756c4d25b7a07391413b/internal/provider/provider.go#L913
 
 
