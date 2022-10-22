@@ -1,0 +1,21 @@
+---
+all:
+  hosts:
+    www.eadipl.ru:
+  children:
+    dbservers:
+      hosts:
+        db[01:02].eadipl.ru:
+    webservers:
+      hosts:
+        app.eadipl.ru:
+        monitoring.eadipl.ru:
+    git:
+      hosts:
+        runner.eadipl.ru:
+        gitlab.eadipl.ru:
+
+  vars:
+    ansible_user: eae
+      
+  
