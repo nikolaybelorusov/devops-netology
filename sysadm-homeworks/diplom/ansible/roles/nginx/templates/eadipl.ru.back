@@ -1,0 +1,17 @@
+server {
+        listen 80;
+#        listen [::]:443 ssl ;
+
+#        server_name eadipl.ru;
+#        ssl_certificate /etc/nginx/ssl/eadipl.ru/fullchain.pem;
+#        ssl_certificate_key /etc/nginx/ssl/eadipl.ru/privkey.pem;
+#        ssl_trusted_certificate /etc/nginx/ssl/eadipl.ru/fullchain.pem;
+        root /var/www/eadipl.ru/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name eadipl.ru www.eadipl.ru;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}

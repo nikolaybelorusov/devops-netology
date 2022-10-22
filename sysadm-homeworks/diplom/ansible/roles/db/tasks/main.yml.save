@@ -1,0 +1,29 @@
+---
+- name: "update"
+  apt:
+    upgrade: no
+    update_cache: yes
+  
+- name: "install mysql"
+  ansible.builtin.apt:
+    name: 
+      - mysql-server
+      - mysql-client
+    state: "latest"
+    update_cache: true
+
+- name: "add address"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysql.cnf
+    regexp: '^bind-address'
+    line: bind-address = {{ db01_ip_addr }}
+- name: Update MySQL configuration with server id
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+#    regexp: '^#server-id'
+    line: server-id = 1
+- name: "Restart MySQL daemon"
+  systemd:
+    name: mysql
+    state: restarted
+    enabled: yes

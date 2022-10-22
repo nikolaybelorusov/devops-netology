@@ -1,0 +1,14 @@
+---
+- name: "update"
+  apt:
+    upgrade: no
+    update_cache: yes
+  
+- name: "install mysql"
+  ansible.builtin.apt:
+    name: 
+      - mysql-server
+      - mysql-client
+    state: "latest"
+    update_cache: true
+

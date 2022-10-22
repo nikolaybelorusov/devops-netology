@@ -1,0 +1,52 @@
+---
+- include_vars: /home/ea/eadipl/terra/group_vars/dbservers/vars.yml
+
+- name: "add address"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^bind-address'
+    line: bind-address = {{ db01_ip_addr }}
+- name: "update server id"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^#[\s]server-id'
+    line: server-id = 1
+- name: "update log_bin"
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^#[\s]log_bin'
+    line: log_bin = /var/log/mysql/mysql-bin.log
+
+- name: "restart MySQL"
+  systemd:
+    name: mysql
+    state: restarted
+    enabled: yes
+
+- name: "create replicator user" 
+  command: sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'replicator'@'%' IDENTIFIED BY 'password';"
+  ignore_errors: yes
+
+- name: "grant replication slave"
+  command: sudo mysql -u root -e "GRANT REPLICATION SLAVE ON *.* TO 'replicator'@'%';"
+  ignore_errors: yes
+
+- name: "status replication"
+  shell:
+    cmd: sudo mysql -u root -e "SHOW MASTER STATUS\G" | grep "Position" | cut -d ":" -f2 | xargs
+  register: mysql_master_position
+
+- name: "status replication"
+  shell:
+    cmd: sudo mysql -u root -e "SHOW MASTER STATUS\G" | grep "File" | cut -d ":" -f2 | xargs
+  register: mysql_master_file
+
+- name: "create wp user SQL query"
+  command: sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED WITH mysql_native_password BY 'wordpress';"
+
+- name: "create wp database SQL query"
+  command: sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS wordpress;"
+
+- name: "user with all privileges"
+  command: sudo mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'%';"
+

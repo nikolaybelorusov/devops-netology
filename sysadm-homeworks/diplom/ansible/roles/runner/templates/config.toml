@@ -1,0 +1,20 @@
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "http://gitlab.eadipl.ru"
+  url = "http://gitlab.eadipl.ru"
+  id = 2
+  token = "kLcvBr9cgs_4G6e-4mEX"
+  token_obtained_at = 2022-10-17T20:43:19Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "shell"
+  clone_url = "http://gitlab.eadipl.ru"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]

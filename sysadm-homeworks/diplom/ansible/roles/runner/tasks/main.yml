@@ -1,0 +1,17 @@
+---
+- name: download gitlab-runner
+  command: wget "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" 
+
+- name: download gitlab-runner
+  command: chmod 755 script.deb.sh
+
+- name: download gitlab-runner
+  command: ./script.deb.sh
+
+- name: install gitlab-runner
+  command: apt install gitlab-runner
+   
+- name: "copy config.toml"
+  copy:
+    src: ~/eadipl/terra/roles/runner/templates/config.toml
+    dest: /etc/gitlab-runner/config.toml

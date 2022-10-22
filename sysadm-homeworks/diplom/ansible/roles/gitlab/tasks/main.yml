@@ -1,0 +1,26 @@
+---
+- name: "create directory gitlab"
+  file:
+    path: /opt/gitlab
+    state: directory
+    mode: '0755'
+
+- name: "copy docker-compose.yml"
+  copy:
+    src: ~/eadipl/terra/roles/gitlab/templates/docker-compose.yml
+    dest: /opt/gitlab/docker-compose.yml
+
+- name: "create directory gitlab"
+  file:
+    path: /etc/gitlab
+    state: directory
+    mode: '0755'
+
+- name: "copy gitlab.rb"
+  copy:
+    src: ~/eadipl/terra/roles/gitlab/templates/gitlab.rb
+    dest: /etc/gitlab/gitlab.rb
+
+
+
+  

@@ -1,0 +1,49 @@
+---
+- include_vars: /home/ea/eadipl/terra/group_vars/dbservers/vars.yml
+- name: "update"
+  apt:
+    upgrade: no
+    update_cache: yes
+- name: install
+  ansible.builtin.apt:
+    name:
+      - 'nginx'
+      - 'wordpress'
+      - 'php'
+      - 'php-curl'
+      - 'php-gd' 
+      - 'php-intl' 
+      - 'php-mbstring' 
+      - 'php-soap' 
+      - 'php-xml' 
+      - 'php-xmlrpc' 
+      - 'php-zip'
+    state: "present"
+    update_cache: true
+
+- name: "copy nginx config"
+  copy:
+    src: ~/eadipl/terra/roles/wordpress/templates/eadipl.ru
+    dest: /etc/nginx/sites-available/default
+
+- name: "restart nginx"
+  shell: systemctl restart nginx
+
+- name: secret key
+  command: curl -s https://api.wordpress.org/secret-key/1.1/salt/
+  register: wp_key
+
+- name: "copy wp config"
+  copy:
+    src: ~/eadipl/terra/roles/wordpress/templates/wp-config.php
+    dest: /usr/share/wordpress/wp-config.php
+           
+- name: copy wp folder
+  command: cp -a /usr/share/wordpress/. /var/www/html
+
+- name: chown 
+  command: chown -R www-data:www-data /var/www/html
+
+- name: "restart nginx"
+  shell: systemctl restart nginx
+

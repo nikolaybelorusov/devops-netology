@@ -1,0 +1,144 @@
+---
+- name: "install ngnix"
+  ansible.builtin.apt:
+    name: "nginx"
+    state: "latest"
+    update_cache: true
+  notify:
+    - nginx systemd
+
+- name: "install Certbot"
+  ansible.builtin.apt:
+    name: "certbot"
+    state: "latest"
+    update_cache: true
+
+- name: "install certbot2"
+  ansible.builtin.apt:
+    name: "python3-certbot-nginx"
+    state: "latest"
+    update_cache: true
+
+- name: "create directory"
+  file:
+    path: /var/www/eadipl.ru/html
+    state: directory
+    mode: '0755'
+
+- name: "copy html"
+  copy:
+    src: ~/eadipl/terra/roles/nginx/templates/index.html
+    dest: /var/www/eadipl.ru/html/index.html
+
+- name: "copy nginx config"
+  copy:
+    src: ~/eadipl/terra/roles/nginx/templates/eadipl.ru
+    dest: /etc/nginx/sites-available/eadipl.ru
+
+- name: "create link"
+  shell: ln -fs /etc/nginx/sites-available/eadipl.ru /etc/nginx/sites-enabled/
+
+- name: "restart nginx"
+  shell: systemctl restart nginx
+
+- name: "Create required directories in /etc/letsencrypt"
+  file:
+    path: "/etc/letsencrypt/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=x,o=x
+  with_items:
+  - account
+  - certs
+  - csrs
+  - keys
+- name: "Generate a Let's Encrypt account key"
+  shell: "openssl genrsa 4096 | sudo tee {{ letsencrypt_account_key }}"
+
+- name: "Generate Let's Encrypt private key"
+  shell: "openssl genrsa 4096 | sudo tee /etc/letsencrypt/keys/{{ domain_name }}.key"
+
+- name: "Generate Let's Encrypt CSR"
+  shell: "openssl req -new -sha256 -key /etc/letsencrypt/keys/{{ domain_name }}.key -subj \"/CN={{ domain_name }}\" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf \"\n[SAN]\nsubjectAltName=DNS:{{ domain_name }},DNS:www.{{ domain_name }}\")) | sudo tee /etc/letsencrypt/csrs/{{ domain_name }}.csr"
+  args:
+    executable: /bin/bash
+
+- name: "Begin Let's Encrypt challenges"
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ acme_email }}"
+    terms_agreed: 1
+    challenge: "{{ acme_challenge_type }}"
+    csr: "{{ letsencrypt_csrs_dir }}/{{ domain_name }}.csr"
+    dest: "{{ letsencrypt_certs_dir }}/{{ domain_name }}.crt"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ domain_name }}.crt"
+    remaining_days: 91
+  register: acme_challenge_eadipl_ru
+- name: "Create .well-known/acme-challenge directory"
+  file:
+    path: /var/www/eadipl.ru/html/.well-known/acme-challenge
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+- name: "Implement http-01 challenge files"
+  copy:
+    content: "{{ acme_challenge_eadipl_ru['challenge_data'][item]['http-01']['resource_value'] }}"
+    dest: "/var/www/eadipl.ru/html/{{ acme_challenge_eadipl_ru['challenge_data'][item]['http-01']['resource'] }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  with_items:
+  - "{{ domain_name }}"
+  - "www.{{ domain_name }}"
+
+- name: "Complete Let's Encrypt challenges"
+  acme_certificate:
+    acme_directory: "{{ acme_directory }}"
+    acme_version: "{{ acme_version }}"
+    account_key_src: "{{ letsencrypt_account_key }}"
+    account_email: "{{ acme_email }}"
+    challenge: "{{ acme_challenge_type }}"
+    csr: "{{ letsencrypt_csrs_dir }}/{{ domain_name }}.csr"
+    dest: "{{ letsencrypt_certs_dir }}/{{ domain_name }}.pem"
+    chain_dest: "{{ letsencrypt_certs_dir }}/chain_{{ domain_name }}.pem"
+    fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ domain_name }}.pem"
+    data: "{{ acme_challenge_eadipl_ru }}"
+
+#- name: "generate serts"
+#  shell: echo 'y' | bash -c
+#    'certbot --nginx
+#    --noninteractive
+#    --agree-tos
+#    --redirect
+#    --email {{ acme_email }}
+#    --expand
+#    -d  {{ domain_name }},www.{{ domain_name }}
+#    -d gitlab.{{ domain_name }}
+#    -d grafana.{{ domain_name }}
+#    -d prometheus.{{ domain_name }}
+#    -d alertmanager.{{ domain_name }}'
+- name: "erase default"
+  command: echo > /etc/nginx/sites-available/default
+- name: "generate serts www.eadipl.ru"
+  command: certbot  -d eadipl.ru -d www.eadipl.ru -m belorusov.nikolay@gmail.com --nginx --agree-tos --no-redirect
+- name: "generate serts  grafana.eadipl.ru"
+  certbot -d grafana.eadipl.ru -m belorusov.nikolay@gmail.com --nginx --agree-tos --no-redirect
+- name: "generate serts gitlab.eadipl.ru"
+  certbot -d gitlab.eadipl.ru -m belorusov.nikolay@gmail.com --nginx --agree-tos --no-redirect
+- name: "generate serts  alertmanager.eadipl.ru"
+  certbot -d alertmanager.eadipl.ru -m belorusov.nikolay@gmail.com --nginx --agree-tos --no-redirect
+- name: "generate serts prometheus.eadipl.ru"
+  certbot -d prometheus.eadipl.ru -m belorusov.nikolay@gmail.com --nginx --agree-tos --no-redirect
+- name: "copy nginx config"
+  copy:
+    src: ~/eadipl/terra/roles/nginx/templates/eadipl.ru3
+    dest: /etc/nginx/sites-available/eadipl.ru
+    force: yes
+
+
+- name: "restart nginx"
+  shell: systemctl restart nginx
