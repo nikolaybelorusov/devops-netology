@@ -1,10 +1,10 @@
 # Домашнее задание к занятию "6.4. PostgreSQL"
 ## 1. Регистрация доменного имени
 Домен зарегистрирован, настроено делегирование DNS
-![img_18.png](img_18.png)
+![img](https://github.com/nikolaybelorusov/devops-netology/blob/main/sysadm-homeworks/diplom/screenshots/domain/dom.JPG)
 ## 2. Создание инфраструктуры
 Вся необходимая инфрастуктура создана с помощью [Terraform](https://github.com/nikolaybelorusov/devops-netology/tree/main/sysadm-homeworks/diplom/terraform)
-![img_17.png](img_17.png)
+![img_17.png](https://github.com/nikolaybelorusov/devops-netology/blob/main/sysadm-homeworks/diplom/screenshots/Yc/yc.JPG)
 Созданы 2 workspace
 ```commandline
 ea@ea-nb:~/eadipl/terra$ terraform workspace list
