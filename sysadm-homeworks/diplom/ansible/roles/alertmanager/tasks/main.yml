@@ -1,0 +1,25 @@
+---
+- name: update and install prometheus
+  apt:
+    name: prometheus-alertmanager
+    state: latest
+    update_cache: yes
+- name: configure AM rules
+  copy:
+    src: "alert_rules.yml"
+    dest: "/etc/prometheus/alert_rules.yml"
+    backup: true
+    mode: 0644
+    owner: root
+- name: configure AM
+  copy:
+    src: "alertmanager.yml.j2"
+    dest: "/etc/prometheus/alertmanager.yml"
+    backup: true
+    mode: 0644
+    owner: root
+- name: start AM
+  systemd:
+    name: prometheus-alertmanager
+    state: started
+    enabled: yes
