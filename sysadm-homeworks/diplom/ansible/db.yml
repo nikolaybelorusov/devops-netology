@@ -1,0 +1,26 @@
+---
+- hosts: dbservers
+  become: true
+  become_method:
+    sudo
+  roles:
+   - db
+  
+- hosts: "db01.eadipl.ru"
+#- hosts: 178.154.222.42
+  become: true
+  become_method:
+    sudo
+  roles:
+   - db_master
+
+
+- hosts: "db02.eadipl.ru"
+
+  become: true
+  become_method:
+    sudo
+  vars:
+    - mysql_master_position: "{{ hostvars['db01.eadipl.ru']['mysql_master_position'] }}"
+  roles:
+   - db_slave

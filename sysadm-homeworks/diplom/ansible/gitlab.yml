@@ -1,0 +1,21 @@
+---
+- hosts: git
+  become: true
+  become_method:
+    sudo
+  roles:
+   - git
+
+- hosts: gitlab.eadipl.ru
+  become: true
+  become_method:
+    sudo
+  roles:
+   - gitlab
+
+- hosts: runner.eadipl.ru
+  become: true
+  become_method:
+    sudo
+  roles:
+   - runner

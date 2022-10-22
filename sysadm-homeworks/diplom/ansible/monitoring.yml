@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  roles:
+  - node-exporter
+
+
+- hosts: monitoring.eadipl.ru
+  become: true
+  become_method:
+    sudo
+  roles:
+  - prometheus
+  - grafana
+  - alertmanager 

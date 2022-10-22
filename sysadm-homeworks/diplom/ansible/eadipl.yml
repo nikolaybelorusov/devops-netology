@@ -1,0 +1,24 @@
+---
+- hosts: "www.eadipl.ru"
+#- hosts: 178.154.222.42
+  become: true
+  become_method:
+    sudo
+  roles:
+   - nginx
+#  tasks:
+#  - name: "install ngnix"
+#    ansible.builtin.apt:
+#      name: "nginx"
+#      state: "latest"
+#      update_cache: true
+#  - name: "install Certbot"
+#    ansible.builtin.apt:
+#      name: "certbot"
+#      state: "latest"
+#      update_cache: true
+#  - name: "install certbot2"
+#    ansible.builtin.apt:
+#      name: "python3-certbot-nginx"
+#      state: "latest"
+#      update_cache: true
